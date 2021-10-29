@@ -1,58 +1,20 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:watchpets/services/authservice.dart';
 
-void main() => runApp(const FacebookApp());
-
-class FacebookApp extends StatefulWidget {
-  const FacebookApp({Key? key}) : super(key: key);
-
-  @override
-  _FacebookAppState createState() => _FacebookAppState();
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
-class _FacebookAppState extends State<FacebookApp> {
-  Map? _userData;
-
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(
-              'Facebook (Logged ' + (_userData == null ? 'out' : 'in') + ')'),
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              ElevatedButton(
-                  onPressed: () async {
-                    final result = await FacebookAuth.instance
-                        .login(permissions: ["public_profile", "email"]);
-
-                    if (result.status == LoginStatus.success) {
-                      final requestData =
-                          await FacebookAuth.instance.getUserData(
-                        fields: "email",
-                      );
-
-                      setState(() {
-                        _userData = requestData;
-                      });
-                    }
-                  },
-                  child: Text('Log In')),
-              ElevatedButton(
-                  onPressed: () async {
-                    await FacebookAuth.instance.logOut();
-                    setState(() {
-                      _userData = null;
-                    });
-                  },
-                  child: Text('Log Out')),
-            ],
-          ),
-        ),
-      ),
+      debugShowCheckedModeBanner: false,
+      home: AuthService().handleAuth(),
     );
   }
 }
